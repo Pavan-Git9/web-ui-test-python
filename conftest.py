@@ -19,12 +19,14 @@ def pytest_addoption(parser):
         help="Browser to run tests (chrome, edge)"
     )
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def setup(request):
     browser = request.config.getoption("--browser").lower()
 
     if browser == "chrome":
         options = webdriver.ChromeOptions()
+        # user_data_dir = os.path.join(tempfile.gettempdir(), f"chrome-profile-{uuid.uuid4()}")
+        # options.add_argument(f"--user-data-dir={user_data_dir}")
         options.add_argument("--no-first-run")
         options.add_argument("--no-default-browser-check")
         options.add_argument("--disable-popup-blocking")
@@ -40,6 +42,8 @@ def setup(request):
         options = webdriver.EdgeOptions()
         user_data_dir = os.path.join(tempfile.gettempdir(), f"edge-profile-{uuid.uuid4()}")
         options.add_argument(f"--user-data-dir={user_data_dir}")
+        options.add_argument("--no-first-run")
+        options.add_argument("--start-maximized")
         driver = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()), options=options)
 
     else:
